@@ -28,17 +28,32 @@ window.wp = window.wp || {};
 
 		// Check file details after attachment
 		$attachment_input.on( 'change', function() {
-			error_files = validate_attachments( this.files );
-			if ( error_files.length ) {
-				// Unset the item and clear the successful attachment details
-				$attachment_input.wrap( '<form>' ).closest( 'form' ).get(0).reset();
-				$attachment_details.empty();
-			} else {
-				$attachment_errors.empty().hide();
-			}
-			return;
+			process_attachment_change( this );
 		} );
 	} );
+
+	function process_attachment_change( file_input ) {
+		error_files = validate_attachments( file_input.files );
+		if ( error_files.length ) {
+			// Unset the item and clear the successful attachment details
+			$attachment_input.wrap( '<form>' ).closest( 'form' ).get(0).reset();
+
+			// Unwrap the <form> element
+			var formcontents = $attachment_input.closest( 'form' ).html();
+			$attachment_input.closest( 'form' ).replaceWith( formcontents );
+
+			// Reindex and bind
+			$attachment_input = $( '#bpma-attachments' );
+			$attachment_input.on( 'change', function() {
+				process_attachment_change( this );
+			} );
+
+			$attachment_details.empty();
+		} else {
+			$attachment_errors.empty().hide();
+		}
+		return;
+	}
 
 	function validate_attachments( files ) {
 		error_files = [];
