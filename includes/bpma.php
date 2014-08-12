@@ -362,7 +362,7 @@ function bpma_serve_attachments() {
 	readfile( $att_path );
 	exit;
 }
-add_action( 'bp_actions', 'bpma_serve_attachments' );
+add_action( 'wp', 'bpma_serve_attachments', 0 );
 
 /**
  * Add attachment message to notification email.
