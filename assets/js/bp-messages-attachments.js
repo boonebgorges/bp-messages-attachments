@@ -33,6 +33,8 @@ window.wp = window.wp || {};
 				// Unset the item and clear the successful attachment details
 				$attachment_input.wrap( '<form>' ).closest( 'form' ).get(0).reset();
 				$attachment_details.empty();
+			} else {
+				$attachment_errors.empty().hide();
 			}
 			return;
 		} );
