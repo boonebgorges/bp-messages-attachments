@@ -315,6 +315,9 @@ function bpma_serve_attachments() {
 	else
 		$mimetype = 'image/' . substr( $att_path, strrpos( $att_path, '.' ) + 1 );
 
+	// Filename
+	header( 'Content-Disposition: attachment; filename="' . basename( $att_path ) . '"' );
+
 	header( 'Content-Type: ' . $mimetype ); // always send this
 	if ( false === strpos( $_SERVER['SERVER_SOFTWARE'], 'Microsoft-IIS' ) )
 		header( 'Content-Length: ' . filesize( $att_path ) );
