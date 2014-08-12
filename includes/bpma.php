@@ -69,7 +69,7 @@ function bpma_display_attachment_markup() {
 			<?php foreach ( $attachments as $attachment ) : ?>
 				<li>
 					<img src="<?php echo esc_attr( $attachment->mime_type_icon ) ?>" />
-					<a href="<?php echo esc_attr( $attachment->file_data['url'] ) ?>"><?php echo esc_html( basename( $attachment->file_data['url'] ) ) ?></a>
+					<a href="<?php echo esc_attr( $attachment->guid ) ?>"><?php echo esc_html( basename( $attachment->guid ) ) ?></a>
 				</li>
 			<?php endforeach ?>
 			</ul>
@@ -100,10 +100,10 @@ function bpma_get_message_attachments( $message_id ) {
 	$atts = $atts_query->posts;
 
 	foreach ( $atts as &$att ) {
-		$att->file_data = get_post_meta( $att->ID, '_wp_attached_file', true );
+		$att->file_path = get_post_meta( $att->ID, '_wp_attached_file', true );
 
-		if ( ! empty( $att->file_data['type'] ) ) {
-			$att->mime_type_icon = wp_mime_type_icon( $att->file_data['type'] );
+		if ( ! empty( $att->post_mime_type ) ) {
+			$att->mime_type_icon = wp_mime_type_icon( $att->post_mime_type );
 		}
 	}
 
@@ -212,7 +212,7 @@ function bpma_create_message_attachment( BP_Messages_Message $message, $upload )
 	);
 
 	// Save the data
-	$id = wp_insert_attachment( $attachment, $upload, 0 );
+	$id = wp_insert_attachment( $attachment, $upload['file'], 0 );
 	if ( ! is_wp_error( $id ) ) {
 		if ( ! function_exists( 'wp_generate_attachment_metadata' ) ) {
 			require_once ABSPATH . '/wp-admin/includes/image.php';
@@ -365,9 +365,6 @@ add_action( 'bp_actions', 'bpma_serve_attachments' );
  * Add attachment message to notification email.
  */
 function bpma_notification_filter( $email_content, $sender_name, $subject, $content, $message_link ) {
-	var_dump( func_get_args() );
-	var_Dump( buddypress()->bpma_message );
-
 	if ( empty( buddypress()->bpma_message ) ) {
 		return $email_content;
 	}
@@ -377,7 +374,7 @@ function bpma_notification_filter( $email_content, $sender_name, $subject, $cont
 	if ( ! empty( $attachments ) ) {
 		$att_links = array();
 		foreach ( $attachments as $attachment ) {
-			$att_links[] = '- ' . $attachment->file_data['url'] . "\n";
+			$att_links[] = '- ' . $attachment->guid . "\n";
 		}
 		$att_links_text = sprintf( __( "This message has attachments: \n%s", 'bp-messages-attachments' ), implode( '', $att_links ) );
 
