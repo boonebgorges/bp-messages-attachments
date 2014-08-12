@@ -18,3 +18,16 @@
 	max-height: 1.5em;
 	margin-right: .5em;
 }
+
+#buddypress ul#bpma-attachment-errors {
+	list-style-type: none;
+	margin: 1em 0;
+	padding: .5em;
+	border: 2px solid #f00;
+	border-radius: 3px;
+	display: none;
+}
+
+#buddypress ul#bpma-attachment-errors li {
+	margin: 0;
+}

@@ -19,6 +19,20 @@ function bpma_enqueue_assets() {
 //		wp_enqueue_media();
 		wp_enqueue_script( 'bp-messages-attachments', BPMA_PLUGIN_URL . 'assets/js/bp-messages-attachments.js', array( $handle ) );
 		wp_enqueue_style( 'bp-messages-attachments', BPMA_PLUGIN_URL . 'assets/css/bp-messages-attachments.css' );
+
+		$settings = apply_filters( 'bpma_upload_settings', array(
+			'file_types' => get_allowed_mime_types(),
+			'max_size'   => wp_max_upload_size(),
+		) );
+
+		// Merge with normal translatable strings
+		$max_size_display = floor( $settings['max_size'] / 1028 );
+		$strings = array_merge( $settings, array(
+			'bad_size' => sprintf( __( 'The following file exceeds the maximum upload size of %s M:', 'bp-messages-attachments' ), $max_size_display ),
+			'bad_type' => __( 'The following files is not of a permitted file type:', 'bp-messages-attachments' ),
+		) );
+
+		wp_localize_script( 'bp-messages-attachments', 'BP_Messages_Attachments', $strings );
 	}
 }
 add_action( 'bp_enqueue_scripts', 'bpma_enqueue_assets', 20 );
@@ -29,6 +43,12 @@ function bpma_add_attachment_markup() {
 	<label for="bpma-attachments"><?php _e( 'Attachments', 'bp-messages-attachments' ); ?></label>
 
 	<input type="file" name="bpma-attachments[]" id="bpma-attachments" multiple="" />
+	<input type="hidden" name="bpma-attachments-validated" id="bpma-attachments-validated" />
+
+	<div id="bpma-attachment-feedback">
+		<ul id="bpma-attachment-errors"></ul>
+		<ul id="bpma-attachment-details"></ul>
+	</div>
 
 	<?php /* <input type="button" name="bpma-attach-button" id="bpma-attach-button" value="<?php _e( 'Add Attachments', 'bp-messages-attachments' ) ?>" /> */ ?>
 	<?php
