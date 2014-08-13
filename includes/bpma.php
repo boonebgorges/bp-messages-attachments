@@ -117,15 +117,27 @@ function bpma_handle_upload( $message ) {
 
 	// Parse into separate objects that can be passed to wp_handle_upload()
 	$files = array();
+	$submitted_count = count( $_FILES['bpma-attachments']['name'] );
 
-	foreach ( $_FILES['bpma-attachments'] as $fd_key => $fd_values ) {
-		foreach ( $fd_values as $i => $fd_value ) {
-			if ( ! isset( $files[ $i ] ) ) {
-				$files[ $i ] = array();
-			}
-
-			$files[ $i ][ $fd_key ] = $fd_value;
+	for ( $i = 0; $i < $submitted_count; $i++ ) {
+		if ( ! empty( $_FILES['bpma-attachments']['error'][ $i ] ) ) {
+			continue;
 		}
+
+		$this_file = array();
+		foreach ( $_FILES['bpma-attachments'] as $fd_key => $fd_values ) {
+			if ( isset( $fd_values[ $i ] ) ) {
+				$this_file[ $fd_key ] = $fd_values[ $i ];
+			}
+		}
+
+		if ( ! empty( $this_file ) ) {
+			$files[] = $this_file;
+		}
+	}
+
+	if ( empty( $files ) ) {
+		return;
 	}
 
 	// Stash $message in the buddypress() object for reference in the
